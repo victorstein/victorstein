@@ -1,7 +1,7 @@
 ### victorstein
 
-Backend & terminal-tooling engineer in Nicaragua.
-I build CLIs, TUIs, and the infra that runs them — mostly in TypeScript.
+Full-stack TypeScript engineer in Nicaragua.
+I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together.
 
 ---
 
@@ -56,4 +56,3 @@ terminal     wezterm · neovim (lazyvim) · starship · lazygit · pass
 > Also codifying my homelab, GitHub, dotfiles, keyboard, and editor — because if I can't `git blame` it, I'll get around to it.
 
 The real answer to the ultimate question of life, the universe, and everything is… YHWH.
-
