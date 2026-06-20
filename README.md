@@ -27,7 +27,7 @@ I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs 
 
 <a href="https://github.com/victorstein/tawtui"><img src="./assets/cards/tawtui.svg" /></a>
 <a href="https://github.com/victorstein/claude-code-usage-statusline"><img src="./assets/cards/claude-code-usage-statusline.svg" /></a>
-<a href="https://github.com/victorstein/lumentui"><img src="./assets/cards/lumentui.svg" /></a>
+<a href="https://github.com/victorstein/WW-experience-migration"><img src="./assets/cards/WW-experience-migration.svg" /></a>
 
 #### Favorite stack
 
