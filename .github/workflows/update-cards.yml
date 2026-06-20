@@ -32,7 +32,7 @@ jobs:
         # still fails loudly rather than committing a bad card.
         run: |
           mkdir -p assets/cards
-          for repo in tawtui claude-code-usage-statusline lumentui; do
+          for repo in tawtui claude-code-usage-statusline WW-experience-migration; do
             curl -fsSL --retry 5 --retry-all-errors --retry-delay 3 --max-time 30 \
               "https://svg.bookmark.style/api?url=https://github.com/victorstein/$repo&mode=dark&style=horizontal" \
               -o "assets/cards/$repo.svg"
