@@ -23,10 +23,18 @@ jobs:
         # fetches do not produce a stale commit; the workflow run fails
         # loudly instead. To loosen that and accept partials, add
         # `|| true` per-line.
+        #
+        # svg.bookmark.style is a Vercel function that 504s with
+        # FUNCTION_INVOCATION_TIMEOUT on a cache MISS (its edge cache has
+        # s-maxage=86400, so misses cluster around our daily cron). The
+        # render warms up on a retry, so --retry-all-errors self-heals
+        # those transient 504s. We keep -f so a genuinely-down upstream
+        # still fails loudly rather than committing a bad card.
         run: |
           mkdir -p assets/cards
           for repo in tawtui claude-code-usage-statusline lumentui; do
-            curl -fsSL --max-time 30 "https://svg.bookmark.style/api?url=https://github.com/victorstein/$repo&mode=dark&style=horizontal" \
+            curl -fsSL --retry 5 --retry-all-errors --retry-delay 3 --max-time 30 \
+              "https://svg.bookmark.style/api?url=https://github.com/victorstein/$repo&mode=dark&style=horizontal" \
               -o "assets/cards/$repo.svg"
           done
 
