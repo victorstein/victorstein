@@ -1,4 +1,4 @@
-<a><img width="800" src="https://cards.victor-stein.dev/hero.svg" alt="victorstein — Full-stack TypeScript engineer in Nicaragua. I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together. This README is itself produced by a block of OpenTofu (github_repository_file). Yes, really." /></a>
+<a href="#"><img width="800" src="https://cards.victor-stein.dev/hero.svg" alt="victorstein — Full-stack TypeScript engineer in Nicaragua. I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together. This README is itself produced by a block of OpenTofu (github_repository_file). Yes, really." /></a>
 
 ---
 
@@ -8,7 +8,7 @@
 
 #### Favorite stack
 
-<a><img width="780" src="https://cards.victor-stein.dev/stack.svg" alt="Favorite stack — languages: typescript, python, lua, hcl, shell; runtime: bun, node, pnpm; framework: nestjs; data: prisma, sqlite, redis, bullmq; graphql: apollo, graphql-codegen, graphql-armor; tui: ink, opentui, solid; frontend: react, next, tailwind, zustand, tanstack-query; mobile: react-native, expo, nativewind; test: vitest, playwright; infra: opentofu, docker, github-actions, tailscale, aws s3; terminal: wezterm, neovim, starship, lazygit, pass" /></a>
+<a href="#"><img width="780" src="https://cards.victor-stein.dev/stack.svg" alt="Favorite stack — languages: typescript, python, lua, hcl, shell; runtime: bun, node, pnpm; framework: nestjs; data: prisma, sqlite, redis, bullmq; graphql: apollo, graphql-codegen, graphql-armor; tui: ink, opentui, solid; frontend: react, next, tailwind, zustand, tanstack-query; mobile: react-native, expo, nativewind; test: vitest, playwright; infra: opentofu, docker, github-actions, tailscale, aws s3; terminal: wezterm, neovim, starship, lazygit, pass" /></a>
 
 ---
 
