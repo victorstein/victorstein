@@ -2,7 +2,7 @@
 import type { InFlightCard } from "./github"
 
 const MONO = "ui-monospace,SFMono-Regular,Menlo,monospace"
-const W = 400
+const W = 394
 const H = 160
 const MARGIN = 8 // transparent padding baked into the canvas so adjacent cards have a gap (GitHub strips CSS margins)
 const CW = W + 2 * MARGIN
