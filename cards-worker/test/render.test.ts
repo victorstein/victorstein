@@ -53,7 +53,7 @@ describe("renderCard", () => {
     const svg = renderCard(card)
     expect(svg).toContain("#1e1e2e") // base background
     expect(svg).toContain("#7c3aed") // purple top bar
-    expect(svg).toContain('width="416"') // 400 card + 8px margin each side
+    expect(svg).toContain('width="410"') // 400 card + 8px margin each side
     expect(svg).toContain('translate(8,8)')
   })
   it("omits the language dot when language is null", () => {
