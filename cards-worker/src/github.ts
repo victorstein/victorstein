@@ -50,22 +50,31 @@ export interface InFlightCard {
   description: string
   language: string | null
   stars: number
+  pushedAt: string
+  subject: string | null
+  diff: DiffLine[]
 }
 
 export const SLOT_COUNT = 4
 
-export function selectInFlightRepos(repos: GitHubRepo[]): InFlightCard[] {
+export function selectInFlightRepos(repos: GitHubRepo[]): GitHubRepo[] {
   return repos
     .filter((r) => !r.fork && !r.archived && !r.private)
     .sort((a, b) => Date.parse(b.pushed_at) - Date.parse(a.pushed_at))
     .slice(0, SLOT_COUNT)
-    .map((r) => ({
-      name: r.name,
-      url: r.html_url,
-      description: r.description ?? "",
-      language: r.language,
-      stars: r.stargazers_count,
-    }))
+}
+
+export function buildCard(repo: GitHubRepo, commit: CommitInfo | null): InFlightCard {
+  return {
+    name: repo.name,
+    url: repo.html_url,
+    description: repo.description ?? "",
+    language: repo.language,
+    stars: repo.stargazers_count,
+    pushedAt: repo.pushed_at,
+    subject: commit?.subject ?? null,
+    diff: commit?.diff ?? [],
+  }
 }
 
 export async function fetchRepos(username: string, token?: string): Promise<GitHubRepo[]> {
