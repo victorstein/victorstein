@@ -1,25 +1,4 @@
-### victorstein
-
-Full-stack TypeScript engineer in Nicaragua.
-I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together.
-
----
-
-> **the block of OpenTofu that produces this profile:**
->
-> ```hcl
-> # stein-infra/tofu/repos.tf
-> resource "github_repository_file" "this" {
->   for_each = local.repository_files
->
->   repository          = each.value.repository  # "victorstein"
->   file                = each.value.file        # "README.md"
->   content             = each.value.content     # file("profile-readme.md")
->   overwrite_on_create = true
-> }
-> ```
->
-> Yes, really.
+<img width="800" src="https://cards.victor-stein.dev/hero.svg" alt="victorstein — Full-stack TypeScript engineer in Nicaragua. I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together. This README is itself produced by a block of OpenTofu (github_repository_file). Yes, really." />
 
 ---
 
