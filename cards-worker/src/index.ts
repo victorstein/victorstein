@@ -6,7 +6,7 @@ import {
   fetchLatestCommit,
   type InFlightCard,
 } from "./github"
-import { renderCard, renderPlaceholder } from "./render"
+import { renderCard, renderPlaceholder, renderStack } from "./render"
 import { parseRoute } from "./router"
 
 const USERNAME = "victorstein"
@@ -46,6 +46,11 @@ async function getSelection(env: Env): Promise<InFlightCard[]> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
+    if (url.pathname === "/stack.svg") {
+      return new Response(renderStack(), {
+        headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
+      })
+    }
     const route = parseRoute(url.pathname)
     if (!route) return new Response("Not found", { status: 404 })
 
