@@ -2,8 +2,11 @@
 import type { InFlightCard } from "./github"
 
 const MONO = "ui-monospace,SFMono-Regular,Menlo,monospace"
-const W = 410
+const W = 400
 const H = 160
+const MARGIN = 8 // transparent padding baked into the canvas so adjacent cards have a gap (GitHub strips CSS margins)
+const CW = W + 2 * MARGIN
+const CH = H + 2 * MARGIN
 
 const THEME = {
   bg: "#1e1e2e",
@@ -91,7 +94,8 @@ export function renderCard(card: InFlightCard): string {
     ? `<circle cx="22" cy="148" r="5" fill="${langColor}"/><text x="34" y="152" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}">${langName}</text>`
     : ""
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}" viewBox="0 0 ${CW} ${CH}" role="img">
+  <g transform="translate(${MARGIN},${MARGIN})">
   <defs><clipPath id="clip"><rect x="0" y="0" width="${W}" height="${H}" rx="9"/></clipPath></defs>
   <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="${THEME.bg}" stroke="${THEME.border}"/>
   <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="${THEME.titlebar}"/>
@@ -104,11 +108,13 @@ export function renderCard(card: InFlightCard): string {
   <line x1="16" y1="134" x2="${W - 16}" y2="134" stroke="${THEME.divider}"/>
   ${lang}
   <text x="${W - 16}" y="152" text-anchor="end" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}"><tspan fill="${THEME.star}">★</tspan> ${meta}</text>
+  </g>
 </svg>`
 }
 
 export function renderPlaceholder(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}" viewBox="0 0 ${CW} ${CH}" role="img">
+  <g transform="translate(${MARGIN},${MARGIN})">
   <defs><clipPath id="clip"><rect x="0" y="0" width="${W}" height="${H}" rx="9"/></clipPath></defs>
   <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="${THEME.bg}" stroke="${THEME.border}"/>
   <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="${THEME.titlebar}"/>
@@ -116,6 +122,7 @@ export function renderPlaceholder(): string {
   <g clip-path="url(#clip)"><rect x="0" y="0" width="${W}" height="5" fill="${THEME.accent}"/></g>
   <circle cx="18" cy="15" r="4" fill="${THEME.red}"/><circle cx="33" cy="15" r="4" fill="${THEME.star}"/><circle cx="48" cy="15" r="4" fill="${THEME.green}"/>
   <text x="${W / 2}" y="${H / 2 + 10}" text-anchor="middle" font-family="${MONO}" font-size="13" fill="${THEME.muted}">❯</text>
+  </g>
 </svg>`
 }
 
