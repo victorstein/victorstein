@@ -16,6 +16,15 @@ const LANG_COLORS: Record<string, string> = {
   Rust: "#dea584",
 }
 
+export function relativeTime(iso: string, now: number = Date.now()): string {
+  const diffMs = Math.max(0, now - Date.parse(iso))
+  const m = Math.floor(diffMs / 60000)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
+}
+
 export function escapeXml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

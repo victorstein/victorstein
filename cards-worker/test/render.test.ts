@@ -1,6 +1,6 @@
 // cards-worker/test/render.test.ts
 import { describe, it, expect } from "vitest"
-import { escapeXml, renderCard, renderPlaceholder } from "../src/render"
+import { escapeXml, renderCard, renderPlaceholder, relativeTime } from "../src/render"
 import type { InFlightCard } from "../src/github"
 
 const card: InFlightCard = {
@@ -56,5 +56,17 @@ describe("renderPlaceholder", () => {
   it("returns a self-contained svg", () => {
     const svg = renderPlaceholder()
     expect(svg.startsWith("<svg")).toBe(true)
+  })
+})
+
+describe("relativeTime", () => {
+  const now = Date.parse("2026-06-20T12:00:00Z")
+  it("formats minutes, hours, and days", () => {
+    expect(relativeTime("2026-06-20T11:30:00Z", now)).toBe("30m ago")
+    expect(relativeTime("2026-06-20T09:00:00Z", now)).toBe("3h ago")
+    expect(relativeTime("2026-06-18T12:00:00Z", now)).toBe("2d ago")
+  })
+  it("never goes negative", () => {
+    expect(relativeTime("2026-06-20T12:05:00Z", now)).toBe("0m ago")
   })
 })
