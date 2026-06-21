@@ -1,6 +1,6 @@
 // cards-worker/test/github.test.ts
 import { describe, it, expect } from "vitest"
-import { selectInFlightRepos, type GitHubRepo } from "../src/github"
+import { selectInFlightRepos, buildCard, extractSubject, extractDiffLines, type GitHubRepo } from "../src/github"
 
 function repo(over: Partial<GitHubRepo>): GitHubRepo {
   const name = over.name ?? "r"
@@ -15,6 +15,7 @@ function repo(over: Partial<GitHubRepo>): GitHubRepo {
     archived: false,
     private: false,
     pushed_at: "2024-01-01T00:00:00Z",
+    default_branch: "main",
     ...over,
   }
 }
@@ -27,35 +28,72 @@ describe("selectInFlightRepos", () => {
       repo({ name: "arch", archived: true }),
       repo({ name: "priv", private: true }),
     ])
-    expect(got.map((c) => c.name)).toEqual(["keep"])
+    expect(got.map((r) => r.name)).toEqual(["keep"])
   })
-
-  it("sorts by pushed_at descending", () => {
-    const got = selectInFlightRepos([
-      repo({ name: "old", pushed_at: "2023-01-01T00:00:00Z" }),
-      repo({ name: "new", pushed_at: "2025-06-01T00:00:00Z" }),
-      repo({ name: "mid", pushed_at: "2024-06-01T00:00:00Z" }),
-    ])
-    expect(got.map((c) => c.name)).toEqual(["new", "mid", "old"])
-  })
-
-  it("returns at most 4 cards and maps fields", () => {
+  it("sorts by pushed_at desc and caps at 4", () => {
     const repos = Array.from({ length: 6 }, (_, i) =>
-      repo({ name: `r${i}`, pushed_at: `2025-01-0${i + 1}T00:00:00Z`, stargazers_count: i, description: `d${i}`, language: "TypeScript" }),
+      repo({ name: `r${i}`, pushed_at: `2025-01-0${i + 1}T00:00:00Z` }),
     )
-    const got = selectInFlightRepos(repos)
-    expect(got).toHaveLength(4)
-    expect(got[0]).toEqual({
-      name: "r5",
-      url: "https://github.com/victorstein/r5",
-      description: "d5",
+    expect(selectInFlightRepos(repos).map((r) => r.name)).toEqual(["r5", "r4", "r3", "r2"])
+  })
+})
+
+describe("buildCard", () => {
+  it("maps repo fields and attaches commit subject + diff", () => {
+    const card = buildCard(repo({ name: "tawtui", stargazers_count: 2, language: "TypeScript", description: "d" }), {
+      subject: "feat: x",
+      diff: [{ sign: "+", text: "a" }],
+    })
+    expect(card).toEqual({
+      name: "tawtui",
+      url: "https://github.com/victorstein/tawtui",
+      description: "d",
       language: "TypeScript",
-      stars: 5,
+      stars: 2,
+      pushedAt: "2024-01-01T00:00:00Z",
+      subject: "feat: x",
+      diff: [{ sign: "+", text: "a" }],
     })
   })
+  it("falls back to null subject + empty diff when commit is null", () => {
+    const card = buildCard(repo({ description: null }), null)
+    expect(card.subject).toBeNull()
+    expect(card.diff).toEqual([])
+    expect(card.description).toBe("")
+  })
+})
 
-  it("coerces null description to empty string", () => {
-    const got = selectInFlightRepos([repo({ description: null })])
-    expect(got[0].description).toBe("")
+describe("extractSubject", () => {
+  it("returns the first line of the commit message", () => {
+    expect(extractSubject("feat: add filter\n\nlonger body here")).toBe("feat: add filter")
+  })
+  it("returns empty string for empty message", () => {
+    expect(extractSubject("")).toBe("")
+  })
+})
+
+describe("extractDiffLines", () => {
+  const patch = [
+    "@@ -1,3 +1,4 @@ context",
+    " unchanged line",
+    "+const filtered = fuzzy(tasks, query)",
+    "-return tasks.filter(matches)",
+    "+another added line",
+  ].join("\n")
+
+  it("takes the first two +/- lines, stripping markers, skipping @@/context", () => {
+    expect(extractDiffLines([{ patch }])).toEqual([
+      { sign: "+", text: "const filtered = fuzzy(tasks, query)" },
+      { sign: "-", text: "return tasks.filter(matches)" },
+    ])
+  })
+  it("skips +++/--- file headers and blank additions", () => {
+    const p = ["+++ b/file.ts", "--- a/file.ts", "@@ -0,0 +1 @@", "+", "+real line"].join("\n")
+    expect(extractDiffLines([{ patch: p }])).toEqual([{ sign: "+", text: "real line" }])
+  })
+  it("returns [] when there are no usable lines or no patch", () => {
+    expect(extractDiffLines([{ patch: "@@ -1 +1 @@\n context only" }])).toEqual([])
+    expect(extractDiffLines([{}])).toEqual([])
+    expect(extractDiffLines(undefined)).toEqual([])
   })
 })
