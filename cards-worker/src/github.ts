@@ -10,6 +10,38 @@ export interface GitHubRepo {
   archived: boolean
   private: boolean
   pushed_at: string
+  default_branch: string
+}
+
+export interface DiffLine {
+  sign: "+" | "-"
+  text: string
+}
+
+export interface CommitInfo {
+  subject: string
+  diff: DiffLine[]
+}
+
+export function extractSubject(message: string): string {
+  return message.split("\n")[0] ?? ""
+}
+
+export function extractDiffLines(files: { patch?: string }[] | undefined): DiffLine[] {
+  const out: DiffLine[] = []
+  for (const f of files ?? []) {
+    if (!f.patch) continue
+    for (const line of f.patch.split("\n")) {
+      if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("@@")) continue
+      const sign = line[0]
+      if (sign !== "+" && sign !== "-") continue
+      const text = line.slice(1).trim()
+      if (text === "") continue
+      out.push({ sign, text })
+      if (out.length >= 2) return out
+    }
+  }
+  return out
 }
 
 export interface InFlightCard {

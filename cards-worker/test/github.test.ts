@@ -1,6 +1,6 @@
 // cards-worker/test/github.test.ts
 import { describe, it, expect } from "vitest"
-import { selectInFlightRepos, type GitHubRepo } from "../src/github"
+import { selectInFlightRepos, extractSubject, extractDiffLines, type GitHubRepo } from "../src/github"
 
 function repo(over: Partial<GitHubRepo>): GitHubRepo {
   const name = over.name ?? "r"
@@ -15,6 +15,7 @@ function repo(over: Partial<GitHubRepo>): GitHubRepo {
     archived: false,
     private: false,
     pushed_at: "2024-01-01T00:00:00Z",
+    default_branch: "main",
     ...over,
   }
 }
@@ -57,5 +58,40 @@ describe("selectInFlightRepos", () => {
   it("coerces null description to empty string", () => {
     const got = selectInFlightRepos([repo({ description: null })])
     expect(got[0].description).toBe("")
+  })
+})
+
+describe("extractSubject", () => {
+  it("returns the first line of the commit message", () => {
+    expect(extractSubject("feat: add filter\n\nlonger body here")).toBe("feat: add filter")
+  })
+  it("returns empty string for empty message", () => {
+    expect(extractSubject("")).toBe("")
+  })
+})
+
+describe("extractDiffLines", () => {
+  const patch = [
+    "@@ -1,3 +1,4 @@ context",
+    " unchanged line",
+    "+const filtered = fuzzy(tasks, query)",
+    "-return tasks.filter(matches)",
+    "+another added line",
+  ].join("\n")
+
+  it("takes the first two +/- lines, stripping markers, skipping @@/context", () => {
+    expect(extractDiffLines([{ patch }])).toEqual([
+      { sign: "+", text: "const filtered = fuzzy(tasks, query)" },
+      { sign: "-", text: "return tasks.filter(matches)" },
+    ])
+  })
+  it("skips +++/--- file headers and blank additions", () => {
+    const p = ["+++ b/file.ts", "--- a/file.ts", "@@ -0,0 +1 @@", "+", "+real line"].join("\n")
+    expect(extractDiffLines([{ patch: p }])).toEqual([{ sign: "+", text: "real line" }])
+  })
+  it("returns [] when there are no usable lines or no patch", () => {
+    expect(extractDiffLines([{ patch: "@@ -1 +1 @@\n context only" }])).toEqual([])
+    expect(extractDiffLines([{}])).toEqual([])
+    expect(extractDiffLines(undefined)).toEqual([])
   })
 })
