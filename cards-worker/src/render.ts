@@ -18,7 +18,9 @@ const LANG_COLORS: Record<string, string> = {
 }
 
 export function relativeTime(iso: string, now: number = Date.now()): string {
-  const diffMs = Math.max(0, now - Date.parse(iso))
+  const t = Date.parse(iso)
+  if (!Number.isFinite(t)) return "—"
+  const diffMs = Math.max(0, now - t)
   const m = Math.floor(diffMs / 60000)
   if (m < 60) return `${m}m ago`
   const h = Math.floor(m / 60)

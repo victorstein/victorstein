@@ -71,4 +71,7 @@ describe("relativeTime", () => {
   it("never goes negative", () => {
     expect(relativeTime("2026-06-20T12:05:00Z", now)).toBe("0m ago")
   })
+  it("returns a dash for unparseable input", () => {
+    expect(relativeTime("not-a-date", now)).toBe("—")
+  })
 })

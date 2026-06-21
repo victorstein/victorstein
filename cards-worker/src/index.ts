@@ -32,12 +32,14 @@ async function getSelection(env: Env): Promise<InFlightCard[]> {
       return buildCard(repo, commit)
     }),
   )
-  await cache.put(
-    cacheKey,
-    new Response(JSON.stringify(cards), {
-      headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${SELECTION_TTL}` },
-    }),
-  )
+  if (cards.some((c) => c.subject !== null)) {
+    await cache.put(
+      cacheKey,
+      new Response(JSON.stringify(cards), {
+        headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${SELECTION_TTL}` },
+      }),
+    )
+  }
   return cards
 }
 
