@@ -77,6 +77,28 @@ export function buildCard(repo: GitHubRepo, commit: CommitInfo | null): InFlight
   }
 }
 
+export async function fetchLatestCommit(
+  owner: string,
+  repo: GitHubRepo,
+  token?: string,
+): Promise<CommitInfo | null> {
+  const headers: Record<string, string> = {
+    "User-Agent": "victorstein-cards-worker",
+    Accept: "application/vnd.github+json",
+  }
+  if (token) headers.Authorization = `Bearer ${token}`
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo.name}/commits/${repo.default_branch}`,
+    { headers },
+  )
+  if (!res.ok) return null
+  const data = (await res.json()) as { commit?: { message?: string }; files?: { patch?: string }[] }
+  return {
+    subject: extractSubject(data.commit?.message ?? ""),
+    diff: extractDiffLines(data.files),
+  }
+}
+
 export async function fetchRepos(username: string, token?: string): Promise<GitHubRepo[]> {
   const headers: Record<string, string> = {
     "User-Agent": "victorstein-cards-worker",

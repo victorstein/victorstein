@@ -1,11 +1,17 @@
 // cards-worker/src/index.ts
-import { fetchRepos, selectInFlightRepos, type InFlightCard } from "./github"
+import {
+  fetchRepos,
+  selectInFlightRepos,
+  buildCard,
+  fetchLatestCommit,
+  type InFlightCard,
+} from "./github"
 import { renderCard, renderPlaceholder } from "./render"
 import { parseRoute } from "./router"
 
 const USERNAME = "victorstein"
 const FALLBACK_URL = "https://github.com/victorstein?tab=repositories&sort=pushed"
-const SELECTION_CACHE_KEY = "https://cards.victor-stein.dev/__cache/selection-v1"
+const SELECTION_CACHE_KEY = "https://cards.victor-stein.dev/__cache/selection-v2"
 const SELECTION_TTL = 5400 // 90 min server-side edge cache (independent of client header)
 
 export interface Env {
@@ -19,14 +25,20 @@ async function getSelection(env: Env): Promise<InFlightCard[]> {
   if (hit) return (await hit.json()) as InFlightCard[]
 
   const repos = await fetchRepos(USERNAME, env.GITHUB_TOKEN)
-  const selection = selectInFlightRepos(repos)
+  const selected = selectInFlightRepos(repos)
+  const cards = await Promise.all(
+    selected.map(async (repo) => {
+      const commit = await fetchLatestCommit(USERNAME, repo, env.GITHUB_TOKEN).catch(() => null)
+      return buildCard(repo, commit)
+    }),
+  )
   await cache.put(
     cacheKey,
-    new Response(JSON.stringify(selection), {
+    new Response(JSON.stringify(cards), {
       headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${SELECTION_TTL}` },
     }),
   )
-  return selection
+  return cards
 }
 
 export default {
