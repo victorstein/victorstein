@@ -1,6 +1,6 @@
 // cards-worker/test/render.test.ts
 import { describe, it, expect } from "vitest"
-import { escapeXml, renderCard, renderPlaceholder, renderStack, relativeTime } from "../src/render"
+import { escapeXml, renderCard, renderPlaceholder, renderStack, renderHero, relativeTime } from "../src/render"
 import type { InFlightCard } from "../src/github"
 
 const card: InFlightCard = {
@@ -101,5 +101,28 @@ describe("relativeTime", () => {
   })
   it("returns a dash for unparseable input", () => {
     expect(relativeTime("not-a-date", now)).toBe("—")
+  })
+})
+
+
+describe("renderHero", () => {
+  const svg = renderHero()
+  it("is a self-contained svg", () => {
+    expect(svg.startsWith("<svg")).toBe(true)
+    expect(svg).not.toContain("<script")
+    expect(svg).not.toContain("<image")
+    expect(svg).not.toMatch(/<a[\s>]/)
+  })
+  it("renders the session, bio, tofu block, and pop caption", () => {
+    expect(svg).toContain("whoami")
+    expect(svg).toContain("Full-stack TypeScript engineer in Nicaragua")
+    expect(svg).toContain("the block of OpenTofu that produces this profile")
+    expect(svg).toContain("github_repository_file")
+    expect(svg).toContain("Yes, really.")
+    expect(svg).toContain("#cba6f7") // mauve pop caption + resource keyword
+    expect(svg).toContain("#7c3aed") // purple bar/prompt
+  })
+  it("is 800 wide to match the README img width", () => {
+    expect(svg).toContain('width="800"')
   })
 })
