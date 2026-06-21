@@ -6,7 +6,7 @@ import {
   fetchLatestCommit,
   type InFlightCard,
 } from "./github"
-import { renderCard, renderPlaceholder, renderStack, renderHero } from "./render"
+import { renderCard, renderPlaceholder, renderStack, renderHero, renderSignOff } from "./render"
 import { parseRoute } from "./router"
 
 const USERNAME = "victorstein"
@@ -53,6 +53,11 @@ export default {
     }
     if (url.pathname === "/hero.svg") {
       return new Response(renderHero(), {
+        headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
+      })
+    }
+    if (url.pathname === "/sign-off.svg") {
+      return new Response(renderSignOff(), {
         headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
       })
     }
