@@ -203,3 +203,52 @@ export function renderHero(): string {
   </g>
 </svg>`
 }
+
+const SO_W = 800
+const SO_H = 470
+const SO_INNER = 35 // cowsay bubble inner width = length of the longest message line
+
+// Camo and HTML-parsed inline SVG collapse runs of real spaces and ignore
+// xml:space, so ASCII art is emitted with U+00A0 — it keeps its monospace
+// advance width and survives sanitization (same reason we emit literal ❯/★/…).
+const nb = (s: string): string => s.replace(/ /g, " ")
+const padCell = (s: string): string => s + " ".repeat(SO_INNER - [...s].length)
+
+export function renderSignOff(): string {
+  const top = nb(" " + "_".repeat(SO_INNER + 2))
+  const bottom = nb(" " + "-".repeat(SO_INNER + 2))
+  const l1 = nb("/ " + padCell("The real answer to the ultimate") + " \\")
+  const l2 = nb("| " + padCell("question of life, the universe, and") + " |")
+  // line 3 carries the YHWH highlight, so it is assembled around a colored tspan.
+  // 20 = visible length of "everything is… YHWH." (inner content; … is one code point).
+  const l3pre = nb("\\ everything is… ")
+  const l3post = nb("." + " ".repeat(SO_INNER - 20) + " /")
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SO_W}" height="${SO_H}" viewBox="0 0 ${SO_W} ${SO_H}" role="img" aria-label="victorstein — also codifying my homelab, GitHub, dotfiles, keyboard, and editor, because if I can't git blame it, I'll get around to it. The real answer to the ultimate question of life, the universe, and everything is… YHWH.">
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${SO_W}" height="${SO_H}" rx="10"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${SO_W - 1}" height="${SO_H - 1}" rx="10" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h${SO_W - 22} a10 10 0 0 1 10 10 v19 h-${SO_W - 1} z" fill="${THEME.titlebar}"/>
+  <line x1="1" y1="30" x2="${SO_W - 1}" y2="30" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${SO_W}" height="5" fill="${THEME.accent}"/></g>
+  <circle cx="20" cy="16" r="4.5" fill="${THEME.red}"/><circle cx="37" cy="16" r="4.5" fill="${THEME.star}"/><circle cx="54" cy="16" r="4.5" fill="${THEME.green}"/>
+  <text x="${SO_W / 2}" y="20" text-anchor="middle" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}">victorstein@stein-cloud — ~/profile</text>
+  <g font-family="${MONO}" font-size="13.5">
+    <text x="20" y="60" fill="${THEME.prompt}">❯ <tspan fill="${THEME.green}">cat</tspan> <tspan fill="${THEME.muted}">/etc/motd</tspan></text>
+    <text x="20" y="82" fill="${THEME.muted}"># Also codifying my homelab, GitHub, dotfiles, keyboard, and editor —</text>
+    <text x="20" y="104" fill="${THEME.muted}"># because if I can't \`git blame\` it, I'll get around to it.</text>
+    <text x="20" y="142" fill="${THEME.prompt}">❯ <tspan fill="${THEME.green}">fortune</tspan> <tspan fill="${THEME.text}">|</tspan> <tspan fill="${THEME.green}">cowsay</tspan></text>
+    <text x="20" y="164" fill="${THEME.muted}">${top}</text>
+    <text x="20" y="186" fill="${THEME.text}">${l1}</text>
+    <text x="20" y="208" fill="${THEME.text}">${l2}</text>
+    <text x="20" y="230" fill="${THEME.text}">${l3pre}<tspan fill="${THEME.star}" font-weight="700">YHWH</tspan>${l3post}</text>
+    <text x="20" y="252" fill="${THEME.muted}">${bottom}</text>
+    <text x="20" y="274" fill="${THEME.muted}">${nb("        \\   ^__^")}</text>
+    <text x="20" y="296" fill="${THEME.muted}">${nb("         \\  (oo)\\_______")}</text>
+    <text x="20" y="318" fill="${THEME.muted}">${nb("            (__)\\       )\\/\\")}</text>
+    <text x="20" y="340" fill="${THEME.muted}">${nb("                ||----w |")}</text>
+    <text x="20" y="362" fill="${THEME.muted}">${nb("                ||     ||")}</text>
+    <text x="20" y="400" fill="${THEME.prompt}">❯ <tspan fill="${THEME.text}">exit</tspan></text>
+    <text x="20" y="422" fill="${THEME.muted}">logout</text>
+    <text x="20" y="444" fill="${THEME.muted}">Connection to stein-cloud closed.</text>
+  </g>
+</svg>`
+}
