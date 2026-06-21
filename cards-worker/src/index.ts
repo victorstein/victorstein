@@ -6,7 +6,7 @@ import {
   fetchLatestCommit,
   type InFlightCard,
 } from "./github"
-import { renderCard, renderPlaceholder, renderStack } from "./render"
+import { renderCard, renderPlaceholder, renderStack, renderHero } from "./render"
 import { parseRoute } from "./router"
 
 const USERNAME = "victorstein"
@@ -48,6 +48,11 @@ export default {
     const url = new URL(request.url)
     if (url.pathname === "/stack.svg") {
       return new Response(renderStack(), {
+        headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
+      })
+    }
+    if (url.pathname === "/hero.svg") {
+      return new Response(renderHero(), {
         headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
       })
     }

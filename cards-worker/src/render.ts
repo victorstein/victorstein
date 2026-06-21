@@ -170,3 +170,36 @@ export function renderStack(): string {
   <g transform="translate(234,338)">${palette}</g>
 </svg>`
 }
+
+const HERO_W = 800
+const HERO_H = 490
+
+export function renderHero(): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${HERO_W}" height="${HERO_H}" viewBox="0 0 ${HERO_W} ${HERO_H}" role="img" aria-label="victorstein — Full-stack TypeScript engineer in Nicaragua. I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs that tie everything together. This README is itself produced by a block of OpenTofu (github_repository_file). Yes, really.">
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${HERO_W}" height="${HERO_H}" rx="10"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${HERO_W - 1}" height="${HERO_H - 1}" rx="10" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h${HERO_W - 22} a10 10 0 0 1 10 10 v19 h-${HERO_W - 1} z" fill="${THEME.titlebar}"/>
+  <line x1="1" y1="30" x2="${HERO_W - 1}" y2="30" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${HERO_W}" height="5" fill="${THEME.accent}"/></g>
+  <circle cx="20" cy="16" r="4.5" fill="${THEME.red}"/><circle cx="37" cy="16" r="4.5" fill="${THEME.star}"/><circle cx="54" cy="16" r="4.5" fill="${THEME.green}"/>
+  <text x="${HERO_W / 2}" y="20" text-anchor="middle" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}">victorstein@stein-cloud — ~/profile</text>
+  <g font-family="${MONO}" font-size="13.5">
+    <text x="20" y="60" fill="${THEME.prompt}">❯ <tspan fill="${THEME.green}">whoami</tspan></text>
+    <text x="20" y="82" fill="${THEME.green}" font-weight="700">victorstein</text>
+    <text x="20" y="116" fill="${THEME.prompt}">❯ <tspan fill="${THEME.green}">cat</tspan> <tspan fill="${THEME.muted}">bio.md</tspan></text>
+    <text x="20" y="138" fill="${THEME.text}">Full-stack TypeScript engineer in Nicaragua. I build NestJS + GraphQL backends,</text>
+    <text x="20" y="158" fill="${THEME.text}">React + Next.js frontends, and the CLIs/TUIs that tie everything together.</text>
+    <text x="20" y="194" fill="${THEME.prompt}">❯ <tspan fill="#cba6f7" font-weight="700"># the block of OpenTofu that produces this profile:</tspan></text>
+    <text x="20" y="216" fill="${THEME.prompt}">❯ <tspan fill="${THEME.green}">bat</tspan> <tspan fill="${THEME.muted}">profile.tf</tspan></text>
+    <text x="20" y="238" fill="${THEME.muted}"># stein-infra/tofu/repos.tf</text>
+    <text x="20" y="260" fill="${THEME.text}"><tspan fill="#cba6f7">resource</tspan> <tspan fill="${THEME.green}">"github_repository_file"</tspan> <tspan fill="${THEME.green}">"this"</tspan> {</text>
+    <text x="36" y="282" fill="${THEME.text}"><tspan fill="${THEME.key}">for_each</tspan> = local.repository_files</text>
+    <text y="320" fill="${THEME.text}"><tspan x="36" fill="${THEME.key}">repository</tspan><tspan x="205" fill="${THEME.muted}">=</tspan><tspan x="224">each.value.repository</tspan><tspan x="410" fill="${THEME.muted}"># "victorstein"</tspan></text>
+    <text y="342" fill="${THEME.text}"><tspan x="36" fill="${THEME.key}">file</tspan><tspan x="205" fill="${THEME.muted}">=</tspan><tspan x="224">each.value.file</tspan><tspan x="410" fill="${THEME.muted}"># "README.md"</tspan></text>
+    <text y="364" fill="${THEME.text}"><tspan x="36" fill="${THEME.key}">content</tspan><tspan x="205" fill="${THEME.muted}">=</tspan><tspan x="224">each.value.content</tspan><tspan x="410" fill="${THEME.muted}"># file("profile-readme.md")</tspan></text>
+    <text y="386" fill="${THEME.text}"><tspan x="36" fill="${THEME.key}">overwrite_on_create</tspan><tspan x="205" fill="${THEME.muted}">=</tspan><tspan x="224" fill="#fab387">true</tspan></text>
+    <text x="20" y="408" fill="${THEME.text}">}</text>
+    <text x="20" y="450" fill="${THEME.muted}"># Yes, really.</text>
+  </g>
+</svg>`
+}
