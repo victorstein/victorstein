@@ -26,7 +26,8 @@ export function escapeXml(s: string): string {
 }
 
 function truncate(s: string, max: number): string {
-  return s.length > max ? s.slice(0, max - 1).trimEnd() + "…" : s
+  const cp = [...s]
+  return cp.length > max ? cp.slice(0, max - 1).join("").trimEnd() + "…" : s
 }
 
 function frame(inner: string): string {

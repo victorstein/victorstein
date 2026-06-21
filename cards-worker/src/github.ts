@@ -47,5 +47,6 @@ export async function fetchRepos(username: string, token?: string): Promise<GitH
     { headers },
   )
   if (!res.ok) throw new Error(`GitHub API ${res.status}`)
-  return (await res.json()) as GitHubRepo[]
+  const data = await res.json()
+  return Array.isArray(data) ? (data as GitHubRepo[]) : []
 }

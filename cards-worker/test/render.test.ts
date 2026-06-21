@@ -43,6 +43,13 @@ describe("renderCard", () => {
     const svg = renderCard({ ...card, language: null })
     expect(svg).not.toContain("<circle")
   })
+
+  it("does not emit a lone surrogate when truncation lands mid-emoji", () => {
+    const svg = renderCard({ ...card, description: "x".repeat(58) + "😀😀😀" })
+    expect(svg).not.toMatch(
+      /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/,
+    )
+  })
 })
 
 describe("renderPlaceholder", () => {
