@@ -29,19 +29,7 @@ I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs 
 
 #### Favorite stack
 
-```text
-languages    typescript · python · lua · hcl · shell
-runtime      bun · node · pnpm
-framework    nestjs (yes, for everything — APIs, daemons, CLIs)
-data         prisma · sqlite · redis · bullmq
-graphql      apollo · graphql-codegen · graphql-armor
-tui          ink · @opentui/core · solid
-frontend     react · next · tailwind · zustand · tanstack-query
-mobile       react-native · expo · nativewind
-test         vitest · playwright
-infra        opentofu · docker · github-actions · tailscale · aws s3
-terminal     wezterm · neovim (lazyvim) · starship · lazygit · pass
-```
+<img width="780" src="https://cards.victor-stein.dev/stack.svg" alt="Favorite stack — languages: typescript, python, lua, hcl, shell; runtime: bun, node, pnpm; framework: nestjs; data: prisma, sqlite, redis, bullmq; graphql: apollo, graphql-codegen, graphql-armor; tui: ink, opentui, solid; frontend: react, next, tailwind, zustand, tanstack-query; mobile: react-native, expo, nativewind; test: vitest, playwright; infra: opentofu, docker, github-actions, tailscale, aws s3; terminal: wezterm, neovim, starship, lazygit, pass" />
 
 #### More
 
