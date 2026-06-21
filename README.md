@@ -25,9 +25,10 @@ I build NestJS + GraphQL backends, React + Next.js frontends, and the CLIs/TUIs 
 
 #### In flight
 
-<a href="https://github.com/victorstein/tawtui"><img src="./assets/cards/tawtui.svg" /></a>
-<a href="https://github.com/victorstein/claude-code-usage-statusline"><img src="./assets/cards/claude-code-usage-statusline.svg" /></a>
-<a href="https://github.com/victorstein/WW-experience-migration"><img src="./assets/cards/WW-experience-migration.svg" /></a>
+<a href="https://cards.victor-stein.dev/in-flight/0"><img src="https://cards.victor-stein.dev/in-flight/0.svg" /></a>
+<a href="https://cards.victor-stein.dev/in-flight/1"><img src="https://cards.victor-stein.dev/in-flight/1.svg" /></a>
+<a href="https://cards.victor-stein.dev/in-flight/2"><img src="https://cards.victor-stein.dev/in-flight/2.svg" /></a>
+<a href="https://cards.victor-stein.dev/in-flight/3"><img src="https://cards.victor-stein.dev/in-flight/3.svg" /></a>
 
 #### Favorite stack
 
