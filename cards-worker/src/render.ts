@@ -1,9 +1,9 @@
 // cards-worker/src/render.ts
 import type { InFlightCard } from "./github"
 
-const WIDTH = 440
-const HEIGHT = 120
-const FONT = "'Segoe UI',Helvetica,Arial,sans-serif"
+const MONO = "ui-monospace,SFMono-Regular,Menlo,monospace"
+const W = 410
+const H = 160
 
 const LANG_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
@@ -14,6 +14,7 @@ const LANG_COLORS: Record<string, string> = {
   Shell: "#89e051",
   Go: "#00ADD8",
   Rust: "#dea584",
+  Ruby: "#701516",
 }
 
 export function relativeTime(iso: string, now: number = Date.now()): string {
@@ -39,31 +40,60 @@ function truncate(s: string, max: number): string {
   return cp.length > max ? cp.slice(0, max - 1).join("").trimEnd() + "…" : s
 }
 
-function frame(inner: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img">
-  <rect x="0.5" y="0.5" width="${WIDTH - 1}" height="${HEIGHT - 1}" rx="10" fill="#0d1117" stroke="#30363d"/>
-  ${inner}
-</svg>`
+function code(s: string): string {
+  return escapeXml(truncate(s, 38))
 }
 
 export function renderCard(card: InFlightCard): string {
-  const name = escapeXml(card.name)
-  const desc = escapeXml(truncate(card.description, 60))
+  const title = escapeXml(truncate(`victorstein/${card.name}`, 40))
+  const promptRepo = escapeXml(truncate(card.name, 18))
   const langColor = card.language ? (LANG_COLORS[card.language] ?? "#8b949e") : null
-  const langText = card.language ? escapeXml(card.language) : ""
-  const langGroup = langColor
-    ? `<circle cx="24" cy="90" r="6" fill="${langColor}"/><text x="36" y="95" font-family="${FONT}" font-size="12" fill="#8b949e">${langText}</text>`
+  const langName = card.language ? escapeXml(card.language.toLowerCase()) : ""
+  const meta = escapeXml(`${card.stars} · ${relativeTime(card.pushedAt)}`)
+
+  let body: string
+  if (card.diff.length > 0) {
+    const subject = `<text x="16" y="76" font-family="${MONO}" font-size="12" fill="#c9d1d9">${code(card.subject ?? "")}</text>`
+    const rows = card.diff
+      .slice(0, 2)
+      .map((d, i) => {
+        const color = d.sign === "+" ? "#3fb950" : "#f85149"
+        return `<text x="16" y="${98 + i * 18}" font-family="${MONO}" font-size="12" fill="${color}">${d.sign} ${code(d.text)}</text>`
+      })
+      .join("")
+    body = subject + rows
+  } else {
+    const desc = `<text x="16" y="80" font-family="${MONO}" font-size="12" fill="#6e7681"># ${code(card.description || "no description")}</text>`
+    const subj = card.subject
+      ? `<text x="16" y="100" font-family="${MONO}" font-size="12" fill="#8b949e">  ${code(card.subject)}</text>`
+      : ""
+    body = desc + subj
+  }
+
+  const lang = langColor
+    ? `<circle cx="22" cy="148" r="5" fill="${langColor}"/><text x="34" y="152" font-family="${MONO}" font-size="11.5" fill="#8b949e">${langName}</text>`
     : ""
-  return frame(
-    `<text x="20" y="34" font-family="${FONT}" font-size="18" font-weight="600" fill="#58a6ff">${name}</text>
-  <text x="20" y="60" font-family="${FONT}" font-size="13" fill="#8b949e">${desc}</text>
-  ${langGroup}
-  <text x="${WIDTH - 20}" y="95" text-anchor="end" font-family="${FONT}" font-size="12" fill="#8b949e">★ ${card.stars}</text>`,
-  )
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
+  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="#0d1117" stroke="#30363d"/>
+  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="#161b22"/>
+  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="#30363d"/>
+  <circle cx="18" cy="15" r="4" fill="#ff5f56"/><circle cx="33" cy="15" r="4" fill="#ffbd2e"/><circle cx="48" cy="15" r="4" fill="#27c93f"/>
+  <text x="${W / 2}" y="19" text-anchor="middle" font-family="${MONO}" font-size="11" fill="#6e7681">${title}</text>
+  <text x="16" y="52" font-family="${MONO}" font-size="13" fill="#58a6ff">❯ <tspan fill="#8b949e">git show</tspan> <tspan fill="#7ee787" font-weight="700">${promptRepo}</tspan></text>
+  ${body}
+  <line x1="16" y1="134" x2="${W - 16}" y2="134" stroke="#21262d"/>
+  ${lang}
+  <text x="${W - 16}" y="152" text-anchor="end" font-family="${MONO}" font-size="11.5" fill="#8b949e"><tspan fill="#e3b341">★</tspan> ${meta}</text>
+</svg>`
 }
 
 export function renderPlaceholder(): string {
-  return frame(
-    `<text x="${WIDTH / 2}" y="${HEIGHT / 2 + 6}" text-anchor="middle" font-family="${FONT}" font-size="16" fill="#8b949e">—</text>`,
-  )
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
+  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="#0d1117" stroke="#30363d"/>
+  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="#161b22"/>
+  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="#30363d"/>
+  <circle cx="18" cy="15" r="4" fill="#ff5f56"/><circle cx="33" cy="15" r="4" fill="#ffbd2e"/><circle cx="48" cy="15" r="4" fill="#27c93f"/>
+  <text x="${W / 2}" y="${H / 2 + 10}" text-anchor="middle" font-family="${MONO}" font-size="13" fill="#6e7681">❯</text>
+</svg>`
 }
