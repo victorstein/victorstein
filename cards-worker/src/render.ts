@@ -5,6 +5,21 @@ const MONO = "ui-monospace,SFMono-Regular,Menlo,monospace"
 const W = 410
 const H = 160
 
+const THEME = {
+  bg: "#1e1e2e",
+  titlebar: "#181825",
+  border: "#45475a",
+  divider: "#313244",
+  text: "#cdd6f4",
+  muted: "#6c7086",
+  prompt: "#7c3aed",
+  green: "#a6e3a1",
+  red: "#f38ba8",
+  key: "#89b4fa",
+  star: "#f9e2af",
+  accent: "#7c3aed",
+}
+
 const LANG_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
   JavaScript: "#f1e05a",
@@ -49,53 +64,102 @@ function code(s: string): string {
 export function renderCard(card: InFlightCard): string {
   const title = escapeXml(truncate(`victorstein/${card.name}`, 40))
   const promptRepo = escapeXml(truncate(card.name, 18))
-  const langColor = card.language ? (LANG_COLORS[card.language] ?? "#8b949e") : null
+  const langColor = card.language ? (LANG_COLORS[card.language] ?? THEME.muted) : null
   const langName = card.language ? escapeXml(card.language.toLowerCase()) : ""
   const meta = escapeXml(`${card.stars} · ${relativeTime(card.pushedAt)}`)
 
   let body: string
   if (card.diff.length > 0) {
-    const subject = `<text x="16" y="76" font-family="${MONO}" font-size="12" fill="#c9d1d9">${code(card.subject ?? "")}</text>`
+    const subject = `<text x="16" y="76" font-family="${MONO}" font-size="12" fill="${THEME.text}">${code(card.subject ?? "")}</text>`
     const rows = card.diff
       .slice(0, 2)
       .map((d, i) => {
-        const color = d.sign === "+" ? "#3fb950" : "#f85149"
+        const color = d.sign === "+" ? THEME.green : THEME.red
         return `<text x="16" y="${98 + i * 18}" font-family="${MONO}" font-size="12" fill="${color}">${d.sign} ${code(d.text)}</text>`
       })
       .join("")
     body = subject + rows
   } else {
-    const desc = `<text x="16" y="80" font-family="${MONO}" font-size="12" fill="#6e7681"># ${code(card.description || "no description")}</text>`
+    const desc = `<text x="16" y="80" font-family="${MONO}" font-size="12" fill="${THEME.muted}"># ${code(card.description || "no description")}</text>`
     const subj = card.subject
-      ? `<text x="16" y="100" font-family="${MONO}" font-size="12" fill="#8b949e">  ${code(card.subject)}</text>`
+      ? `<text x="16" y="100" font-family="${MONO}" font-size="12" fill="${THEME.muted}">  ${code(card.subject)}</text>`
       : ""
     body = desc + subj
   }
 
   const lang = langColor
-    ? `<circle cx="22" cy="148" r="5" fill="${langColor}"/><text x="34" y="152" font-family="${MONO}" font-size="11.5" fill="#8b949e">${langName}</text>`
+    ? `<circle cx="22" cy="148" r="5" fill="${langColor}"/><text x="34" y="152" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}">${langName}</text>`
     : ""
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
-  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="#0d1117" stroke="#30363d"/>
-  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="#161b22"/>
-  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="#30363d"/>
-  <circle cx="18" cy="15" r="4" fill="#ff5f56"/><circle cx="33" cy="15" r="4" fill="#ffbd2e"/><circle cx="48" cy="15" r="4" fill="#27c93f"/>
-  <text x="${W / 2}" y="19" text-anchor="middle" font-family="${MONO}" font-size="11" fill="#6e7681">${title}</text>
-  <text x="16" y="52" font-family="${MONO}" font-size="13" fill="#58a6ff">❯ <tspan fill="#8b949e">git show</tspan> <tspan fill="#7ee787" font-weight="700">${promptRepo}</tspan></text>
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${W}" height="${H}" rx="9"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="${THEME.titlebar}"/>
+  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${W}" height="5" fill="${THEME.accent}"/></g>
+  <circle cx="18" cy="15" r="4" fill="${THEME.red}"/><circle cx="33" cy="15" r="4" fill="${THEME.star}"/><circle cx="48" cy="15" r="4" fill="${THEME.green}"/>
+  <text x="${W / 2}" y="19" text-anchor="middle" font-family="${MONO}" font-size="11" fill="${THEME.muted}">${title}</text>
+  <text x="16" y="52" font-family="${MONO}" font-size="13" fill="${THEME.prompt}">❯ <tspan fill="${THEME.muted}">git show</tspan> <tspan fill="${THEME.green}" font-weight="700">${promptRepo}</tspan></text>
   ${body}
-  <line x1="16" y1="134" x2="${W - 16}" y2="134" stroke="#21262d"/>
+  <line x1="16" y1="134" x2="${W - 16}" y2="134" stroke="${THEME.divider}"/>
   ${lang}
-  <text x="${W - 16}" y="152" text-anchor="end" font-family="${MONO}" font-size="11.5" fill="#8b949e"><tspan fill="#e3b341">★</tspan> ${meta}</text>
+  <text x="${W - 16}" y="152" text-anchor="end" font-family="${MONO}" font-size="11.5" fill="${THEME.muted}"><tspan fill="${THEME.star}">★</tspan> ${meta}</text>
 </svg>`
 }
 
 export function renderPlaceholder(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
-  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="#0d1117" stroke="#30363d"/>
-  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="#161b22"/>
-  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="#30363d"/>
-  <circle cx="18" cy="15" r="4" fill="#ff5f56"/><circle cx="33" cy="15" r="4" fill="#ffbd2e"/><circle cx="48" cy="15" r="4" fill="#27c93f"/>
-  <text x="${W / 2}" y="${H / 2 + 10}" text-anchor="middle" font-family="${MONO}" font-size="13" fill="#6e7681">❯</text>
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${W}" height="${H}" rx="9"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="9" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <path d="M1 10 a9 9 0 0 1 9 -9 h${W - 20} a9 9 0 0 1 9 9 v18 h-${W - 1} z" fill="${THEME.titlebar}"/>
+  <line x1="1" y1="28" x2="${W - 1}" y2="28" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${W}" height="5" fill="${THEME.accent}"/></g>
+  <circle cx="18" cy="15" r="4" fill="${THEME.red}"/><circle cx="33" cy="15" r="4" fill="${THEME.star}"/><circle cx="48" cy="15" r="4" fill="${THEME.green}"/>
+  <text x="${W / 2}" y="${H / 2 + 10}" text-anchor="middle" font-family="${MONO}" font-size="13" fill="${THEME.muted}">❯</text>
+</svg>`
+}
+
+const SW = 780
+const SH = 360
+const NVIM_PATH =
+  "M2.214 4.954v13.615L7.655 24V10.314L3.312 3.845 3.312 3.845 2.214 4.954zm4.999 17.98l-4.557-4.548V5.136l.59-.596 3.967 5.908v12.485zm14.573-4.457l-.862.937-4.24-6.376V0l5.068 5.092.034 13.385zM7.431.001l12.998 19.835-3.637 3.637L3.787 3.683 7.43 0"
+const STACK_PALETTE = ["#f38ba8", "#a6e3a1", "#f9e2af", "#89b4fa", "#cba6f7", "#94e2d5", "#cdd6f4", "#6c7086"]
+const STACK: { key: string; value: string; aside?: string }[] = [
+  { key: "languages", value: "typescript · python · lua · hcl · shell" },
+  { key: "runtime", value: "bun · node · pnpm" },
+  { key: "framework", value: "nestjs", aside: "(yes, for everything — APIs, daemons, CLIs)" },
+  { key: "data", value: "prisma · sqlite · redis · bullmq" },
+  { key: "graphql", value: "apollo · graphql-codegen · graphql-armor" },
+  { key: "tui", value: "ink · @opentui/core · solid" },
+  { key: "frontend", value: "react · next · tailwind · zustand · tanstack-query" },
+  { key: "mobile", value: "react-native · expo · nativewind" },
+  { key: "test", value: "vitest · playwright" },
+  { key: "infra", value: "opentofu · docker · github-actions · tailscale · aws s3" },
+  { key: "terminal", value: "wezterm · neovim (lazyvim) · starship · lazygit · pass" },
+]
+
+export function renderStack(): string {
+  const rows = STACK.map((r, i) => {
+    const y = i * 22
+    const aside = r.aside ? ` <tspan fill="${THEME.muted}">${escapeXml(r.aside)}</tspan>` : ""
+    return (
+      `<text x="0" y="${y}" font-family="${MONO}" font-size="12.5" fill="${THEME.key}" font-weight="700">${escapeXml(r.key)}</text>` +
+      `<text x="96" y="${y}" font-family="${MONO}" font-size="12.5" fill="${THEME.text}">${escapeXml(r.value)}${aside}</text>`
+    )
+  }).join("\n  ")
+
+  const palette = STACK_PALETTE.map((c, i) => `<rect x="${i * 17}" width="13" height="13" rx="2" fill="${c}"/>`).join("")
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="Favorite stack">
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${SW}" height="${SH}" rx="10"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${SW - 1}" height="${SH - 1}" rx="10" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${SW}" height="5" fill="${THEME.accent}"/></g>
+  <g transform="translate(46,123) scale(4.8)"><path d="${NVIM_PATH}" fill="#57A143"/></g>
+  <text x="103" y="270" text-anchor="middle" font-family="${MONO}" font-size="12" fill="${THEME.muted}">neovim</text>
+  <line x1="210" y1="44" x2="210" y2="324" stroke="${THEME.divider}"/>
+  <text x="234" y="54" font-family="${MONO}" font-size="13" fill="${THEME.green}" font-weight="700">stein<tspan fill="${THEME.muted}">@</tspan><tspan fill="#fab387">stein-cloud</tspan></text>
+  <line x1="234" y1="62" x2="754" y2="62" stroke="${THEME.border}"/>
+  <g transform="translate(234,86)">${rows}</g>
+  <g transform="translate(234,338)">${palette}</g>
 </svg>`
 }
