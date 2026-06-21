@@ -118,3 +118,48 @@ export function renderPlaceholder(): string {
   <text x="${W / 2}" y="${H / 2 + 10}" text-anchor="middle" font-family="${MONO}" font-size="13" fill="${THEME.muted}">❯</text>
 </svg>`
 }
+
+const SW = 780
+const SH = 360
+const NVIM_PATH =
+  "M2.214 4.954v13.615L7.655 24V10.314L3.312 3.845 3.312 3.845 2.214 4.954zm4.999 17.98l-4.557-4.548V5.136l.59-.596 3.967 5.908v12.485zm14.573-4.457l-.862.937-4.24-6.376V0l5.068 5.092.034 13.385zM7.431.001l12.998 19.835-3.637 3.637L3.787 3.683 7.43 0"
+const STACK_PALETTE = ["#f38ba8", "#a6e3a1", "#f9e2af", "#89b4fa", "#cba6f7", "#94e2d5", "#cdd6f4", "#6c7086"]
+const STACK: { key: string; value: string; aside?: string }[] = [
+  { key: "languages", value: "typescript · python · lua · hcl · shell" },
+  { key: "runtime", value: "bun · node · pnpm" },
+  { key: "framework", value: "nestjs", aside: "(yes, for everything — APIs, daemons, CLIs)" },
+  { key: "data", value: "prisma · sqlite · redis · bullmq" },
+  { key: "graphql", value: "apollo · graphql-codegen · graphql-armor" },
+  { key: "tui", value: "ink · @opentui/core · solid" },
+  { key: "frontend", value: "react · next · tailwind · zustand · tanstack-query" },
+  { key: "mobile", value: "react-native · expo · nativewind" },
+  { key: "test", value: "vitest · playwright" },
+  { key: "infra", value: "opentofu · docker · github-actions · tailscale · aws s3" },
+  { key: "terminal", value: "wezterm · neovim (lazyvim) · starship · lazygit · pass" },
+]
+
+export function renderStack(): string {
+  const rows = STACK.map((r, i) => {
+    const y = i * 22
+    const aside = r.aside ? ` <tspan fill="${THEME.muted}">${escapeXml(r.aside)}</tspan>` : ""
+    return (
+      `<text x="0" y="${y}" font-family="${MONO}" font-size="12.5" fill="${THEME.key}" font-weight="700">${escapeXml(r.key)}</text>` +
+      `<text x="96" y="${y}" font-family="${MONO}" font-size="12.5" fill="${THEME.text}">${escapeXml(r.value)}${aside}</text>`
+    )
+  }).join("\n  ")
+
+  const palette = STACK_PALETTE.map((c, i) => `<rect x="${i * 17}" width="13" height="13" rx="2" fill="${c}"/>`).join("")
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="Favorite stack">
+  <defs><clipPath id="clip"><rect x="0" y="0" width="${SW}" height="${SH}" rx="10"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="${SW - 1}" height="${SH - 1}" rx="10" fill="${THEME.bg}" stroke="${THEME.border}"/>
+  <g clip-path="url(#clip)"><rect x="0" y="0" width="${SW}" height="5" fill="${THEME.accent}"/></g>
+  <g transform="translate(46,123) scale(4.8)"><path d="${NVIM_PATH}" fill="#57A143"/></g>
+  <text x="103" y="270" text-anchor="middle" font-family="${MONO}" font-size="12" fill="${THEME.muted}">neovim</text>
+  <line x1="210" y1="44" x2="210" y2="324" stroke="${THEME.divider}"/>
+  <text x="234" y="54" font-family="${MONO}" font-size="13" fill="${THEME.green}" font-weight="700">stein<tspan fill="${THEME.muted}">@</tspan><tspan fill="#fab387">stein-cloud</tspan></text>
+  <line x1="234" y1="62" x2="754" y2="62" stroke="${THEME.border}"/>
+  <g transform="translate(234,86)">${rows}</g>
+  <g transform="translate(234,338)">${palette}</g>
+</svg>`
+}

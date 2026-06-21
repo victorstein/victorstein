@@ -1,6 +1,6 @@
 // cards-worker/test/render.test.ts
 import { describe, it, expect } from "vitest"
-import { escapeXml, renderCard, renderPlaceholder, relativeTime } from "../src/render"
+import { escapeXml, renderCard, renderPlaceholder, renderStack, relativeTime } from "../src/render"
 import type { InFlightCard } from "../src/github"
 
 const card: InFlightCard = {
@@ -63,6 +63,27 @@ describe("renderPlaceholder", () => {
   it("returns a self-contained svg", () => {
     const svg = renderPlaceholder()
     expect(svg.startsWith("<svg")).toBe(true)
+  })
+})
+
+describe("renderStack", () => {
+  const svg = renderStack()
+  it("is a self-contained svg", () => {
+    expect(svg.startsWith("<svg")).toBe(true)
+    expect(svg).not.toContain("<script")
+    expect(svg).not.toContain("<image")
+    expect(svg).not.toMatch(/<a[\s>]/)
+  })
+  it("renders the host, neovim mark, keys, and a value", () => {
+    expect(svg).toContain(">stein<tspan") // host user
+    expect(svg).toContain("stein-cloud")
+    expect(svg).toContain("#57A143") // neovim brand green
+    expect(svg).toContain("#89b4fa") // stack key color
+    expect(svg).toContain("typescript")
+    expect(svg).toContain("#7c3aed") // purple bar
+  })
+  it("is 780 wide to match the README img width", () => {
+    expect(svg).toContain('width="780"')
   })
 })
 
