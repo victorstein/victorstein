@@ -1,6 +1,6 @@
 // cards-worker/test/render.test.ts
 import { describe, it, expect } from "vitest"
-import { escapeXml, renderCard, renderPlaceholder, renderStack, renderHero, relativeTime } from "../src/render"
+import { escapeXml, renderCard, renderPlaceholder, renderStack, renderHero, renderSignOff, relativeTime } from "../src/render"
 import type { InFlightCard } from "../src/github"
 
 const card: InFlightCard = {
@@ -121,6 +121,31 @@ describe("renderHero", () => {
     expect(svg).toContain("Yes, really.")
     expect(svg).toContain("#cba6f7") // mauve pop caption + resource keyword
     expect(svg).toContain("#7c3aed") // purple bar/prompt
+  })
+  it("is 800 wide to match the README img width", () => {
+    expect(svg).toContain('width="800"')
+  })
+})
+
+describe("renderSignOff", () => {
+  const svg = renderSignOff()
+  it("is a self-contained svg", () => {
+    expect(svg.startsWith("<svg")).toBe(true)
+    expect(svg).not.toContain("<script")
+    expect(svg).not.toContain("<image")
+    expect(svg).not.toMatch(/<a[\s>]/)
+  })
+  it("renders the motd, fortune|cowsay, and exit lines", () => {
+    expect(svg).toContain("/etc/motd")
+    expect(svg).toContain("fortune")
+    expect(svg).toContain("cowsay")
+    expect(svg).toContain("Connection to stein-cloud closed.")
+    expect(svg).toContain("YHWH")
+    expect(svg).toContain("#7c3aed") // purple bar/prompt
+    expect(svg).toContain("#f9e2af") // YHWH star highlight
+  })
+  it("builds the ascii art with runs of non-breaking spaces", () => {
+    expect(svg).toMatch(/\u00A0\u00A0+/)
   })
   it("is 800 wide to match the README img width", () => {
     expect(svg).toContain('width="800"')
