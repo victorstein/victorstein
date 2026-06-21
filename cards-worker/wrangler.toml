@@ -1,0 +1,7 @@
+name = "victorstein-cards"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+# NOTE: no [[routes]] / custom-domain entry here on purpose.
+# cards.victor-stein.dev is owned by Tofu (stein-infra/tofu/profile-cards.tf).
