@@ -5,3 +5,10 @@ workers_dev = true
 
 # NOTE: no [[routes]] / custom-domain entry here on purpose.
 # cards.victor-stein.dev is owned by Tofu (stein-infra/tofu/profile-cards.tf).
+
+# Runtime secret (set out-of-band, not here):
+#   GITHUB_TOKEN — a read-only fine-grained PAT (public repo metadata only).
+# Without it the worker hits the GitHub API unauthenticated (60 req/hr, shared
+# per Cloudflare colo IP); transient 429/403s then render blank "In flight"
+# tiles. Provisioned by the deploy workflow from the CARDS_GH_API_TOKEN repo
+# secret, or manually: `bunx wrangler secret put GITHUB_TOKEN`.
