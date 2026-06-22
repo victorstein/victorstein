@@ -8,39 +8,62 @@ import {
 } from "./github"
 import { renderCard, renderPlaceholder, renderStack, renderHero, renderSignOff } from "./render"
 import { parseRoute } from "./router"
+import { chooseSelection, isCacheable } from "./selection"
 
 const USERNAME = "victorstein"
 const FALLBACK_URL = "https://github.com/victorstein?tab=repositories&sort=pushed"
 const SELECTION_CACHE_KEY = "https://cards.victor-stein.dev/__cache/selection-v2"
-const SELECTION_TTL = 5400 // 90 min server-side edge cache (independent of client header)
+const SELECTION_FALLBACK_KEY = "https://cards.victor-stein.dev/__cache/selection-fallback-v2"
+const SELECTION_TTL = 5400 // 90 min freshness cache (independent of client header)
+const FALLBACK_TTL = 604800 // 7 day last-known-good cache, served only when a live fetch fails
 
 export interface Env {
   GITHUB_TOKEN?: string
 }
 
-async function getSelection(env: Env): Promise<InFlightCard[]> {
-  const cache = caches.default
-  const cacheKey = new Request(SELECTION_CACHE_KEY)
-  const hit = await cache.match(cacheKey)
-  if (hit) return (await hit.json()) as InFlightCard[]
+async function readCache(cache: Cache, key: string): Promise<InFlightCard[] | null> {
+  const hit = await cache.match(new Request(key))
+  return hit ? ((await hit.json()) as InFlightCard[]) : null
+}
 
+async function buildSelection(env: Env): Promise<InFlightCard[]> {
   const repos = await fetchRepos(USERNAME, env.GITHUB_TOKEN)
   const selected = selectInFlightRepos(repos)
-  const cards = await Promise.all(
+  return Promise.all(
     selected.map(async (repo) => {
       const commit = await fetchLatestCommit(USERNAME, repo, env.GITHUB_TOKEN).catch(() => null)
       return buildCard(repo, commit)
     }),
   )
-  if (cards.some((c) => c.subject !== null)) {
-    await cache.put(
-      cacheKey,
-      new Response(JSON.stringify(cards), {
-        headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${SELECTION_TTL}` },
-      }),
-    )
+}
+
+async function getSelection(env: Env): Promise<InFlightCard[]> {
+  const cache = caches.default
+
+  const fresh = await readCache(cache, SELECTION_CACHE_KEY)
+  if (fresh && fresh.length) return fresh
+
+  let fetched: InFlightCard[] | null = null
+  try {
+    fetched = await buildSelection(env)
+  } catch {
+    fetched = null // GitHub down / rate-limited → fall back below, never blank tiles
   }
-  return cards
+
+  if (fetched && isCacheable(fetched)) {
+    const body = JSON.stringify(fetched)
+    const put = (key: string, ttl: number) =>
+      cache.put(
+        new Request(key),
+        new Response(body, {
+          headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${ttl}` },
+        }),
+      )
+    await Promise.all([put(SELECTION_CACHE_KEY, SELECTION_TTL), put(SELECTION_FALLBACK_KEY, FALLBACK_TTL)])
+  }
+
+  const fallback = fetched && fetched.length ? null : await readCache(cache, SELECTION_FALLBACK_KEY)
+  return chooseSelection({ fresh: null, fetched, fallback })
 }
 
 export default {

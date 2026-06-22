@@ -25,3 +25,20 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      # Sync the worker's GITHUB_TOKEN secret so it calls the GitHub API
+      # authenticated (5000 req/hr) instead of unauthenticated (60 req/hr,
+      # shared per colo IP) — the latter caused rate-limit blips that froze
+      # blank "In flight" tiles in the profile README via Camo's image cache.
+      # Optional: deploys still succeed (worker just runs unauthenticated) if
+      # CARDS_GH_API_TOKEN isn't set. CARD_S* name avoids the reserved GITHUB_ prefix.
+      - name: Sync GITHUB_TOKEN worker secret
+        env:
+          CARDS_GH_API_TOKEN: ${{ secrets.CARDS_GH_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CARDS_GH_API_TOKEN" ]; then
+            printf '%s' "$CARDS_GH_API_TOKEN" | bunx wrangler secret put GITHUB_TOKEN
+          else
+            echo "::warning::CARDS_GH_API_TOKEN not set — cards worker calls GitHub unauthenticated (60 req/hr)."
+          fi
