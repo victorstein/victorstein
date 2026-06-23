@@ -4,7 +4,7 @@ name: Deploy cards worker
 on:
   push:
     branches: [main]
-    paths: ["cards-worker/**"]
+    paths: ["cards-worker/**", ".github/workflows/deploy-cards-worker.yml"]
   workflow_dispatch:
 
 permissions:
@@ -25,3 +25,12 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      # Sync the Tofu-managed read token onto the Worker as its GITHUB_TOKEN
+      # runtime secret, so the renderer authenticates to the GitHub API
+      # (5000 req/hr) instead of unauthenticated (60 req/hr shared per Cloudflare
+      # colo IP). Without it, rate-limit blips empty the In-flight tiles.
+      - run: printf '%s' "$CARDS_GH_API_TOKEN" | bunx wrangler secret put GITHUB_TOKEN
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CARDS_GH_API_TOKEN: ${{ secrets.CARDS_GH_API_TOKEN }}
