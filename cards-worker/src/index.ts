@@ -61,6 +61,27 @@ export default {
         headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "no-store" },
       })
     }
+    if (url.pathname === "/__debug") {
+      const headers: Record<string, string> = {
+        "User-Agent": "victorstein-cards-worker",
+        Accept: "application/vnd.github+json",
+      }
+      if (env.GITHUB_TOKEN) headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`
+      const r = await fetch(
+        `https://api.github.com/users/${USERNAME}/repos?type=owner&sort=pushed&direction=desc&per_page=100`,
+        { headers },
+      )
+      const body = await r.text()
+      return Response.json({
+        hasToken: Boolean(env.GITHUB_TOKEN),
+        tokenLen: env.GITHUB_TOKEN?.length ?? 0,
+        reposStatus: r.status,
+        ratelimitRemaining: r.headers.get("x-ratelimit-remaining"),
+        ratelimitLimit: r.headers.get("x-ratelimit-limit"),
+        bodyPreview: body.slice(0, 200),
+      })
+    }
+
     const route = parseRoute(url.pathname)
     if (!route) return new Response("Not found", { status: 404 })
 
